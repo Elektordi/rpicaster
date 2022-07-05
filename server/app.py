@@ -11,16 +11,12 @@ storage = {}
 clients = []
 
 
-def update_storage(key, value):
-    storage[key] = value
+def broadcast(data):
     for c in clients:
-        c.send(json.dumps({key: value}))
-
-
-def reload_storage(data):
-    storage.update(data)
-    for c in clients:
-        c.send(json.dumps(storage))
+        try:
+            c.send(json.dumps(data))
+        except ConnectionClosed:
+            clients.remove(c)
 
 
 @sock.route('/stream')
@@ -38,7 +34,8 @@ def ws_stream(ws):
 @app.route("/play")
 def route_play():
     page = int(request.args.get('page'))
-    update_storage("page", page)
+    storage["page"] = page
+    broadcast({"page": page})
     return "OK"
 
 
@@ -46,7 +43,7 @@ def route_play():
 def route_reload():
     with open("storage.json", "rt") as f:
         data = json.loads(f.read())
-    reload_storage(data)
+    broadcast(data)
     return "OK"
 
 
