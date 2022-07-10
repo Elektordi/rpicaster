@@ -3,8 +3,16 @@ Raspberry-PI based dynamic display solution
 
 ## Client
 
-TODO
+Usage:
+`./client.py`
+
+Dependencies:
+`apt-get install python3 libqt5gui5 libqt5webengine5`
+
+Rpi-specific:
+`apt-get install omxplayer`
 
 ## Server
 
-TODO
+Usage:
+`./app.py`

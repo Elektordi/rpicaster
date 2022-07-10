@@ -12,6 +12,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWebEngineWidgets import *
 
 storage = {}
+default_page = {"type":"message", "text":"RPiCaster display offline."}
+cache = {"page": default_page}
 
 
 class stream(threading.Thread):
@@ -29,6 +31,11 @@ class stream(threading.Thread):
                     data = json.loads(data)
                     storage.update(data)
                     print(storage)
+                    cache['page'] = storage.get("page_%d"%(storage.get('page', 0)), default_page)
+                    for k in data.keys():
+                        if not k.startswith("page_"):
+                            continue
+                        print(k)
             except (KeyboardInterrupt):
                 sys.exit()
             except (EOFError):
@@ -55,6 +62,7 @@ class MainWindow(QMainWindow):
         self.last_url = "about:blank"
         self.browser.setUrl(QUrl(self.last_url))
 
+        self.setStyleSheet("background-color: black;")
         self.setCentralWidget(self.browser)
 
         self.show()
@@ -72,7 +80,7 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def tick(self):
-        url = storage.get("page_%d"%(storage['page']), {}).get("url")
+        url = cache["page"].get("url")
         if not url:
             return
         if url == self.last_url:

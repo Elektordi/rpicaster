@@ -43,6 +43,7 @@ def route_play():
 def route_reload():
     with open("storage.json", "rt") as f:
         data = json.loads(f.read())
+    storage.update(data)
     broadcast(data)
     return "OK"
 
