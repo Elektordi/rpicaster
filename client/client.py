@@ -6,6 +6,8 @@ import time
 import sys
 import threading
 from copy import copy
+import os
+import subprocess
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -15,6 +17,20 @@ from PyQt5.QtWebEngineWidgets import *
 storage = {}
 default_page = {"type":"status", "text":"RPiCaster display offline."}
 cache = {"page": default_page}
+
+
+def mediaplayer():
+    if "mediaplayer" in cache:
+        return cache["mediaplayer"]
+    if os.path.isfile("/usr/bin/omxplayer"):
+        cache["mediaplayer"] = "/usr/bin/omxplayer"
+    elif os.path.isfile("/usr/bin/mplayer"):
+        cache["mediaplayer"] = "/usr/bin/mplayer"
+    elif os.path.isfile("/usr/bin/ffplay"):
+        cache["mediaplayer"] = "/usr/bin/ffplay"
+    else:
+        cache["mediaplayer"] = "false"
+    return cache["mediaplayer"]
 
 
 class stream(threading.Thread):
@@ -84,9 +100,10 @@ class MainWindow(QMainWindow):
         self.mainwidget.setLayout(self.layout)
         self.setCentralWidget(self.mainwidget)
 
-        self.last_page = default_page
         self.last_url = ""
         self.last_url_img = ""
+        self.player_process = None
+        self.last_page = default_page
         self.content(self.last_page)
 
         self.setStyleSheet("background-color: black; color: white;")
@@ -134,11 +151,24 @@ class MainWindow(QMainWindow):
                 self.browser.setUrl(QUrl(url))
             self.layout.setCurrentWidget(self.browser)
         elif pagetype == "videostream":
-            pass # TODO
+            self.layout.setCurrentWidget(self.black)
+            cmd = [mediaplayer(), page.get('url', 'invalid:')]
+            try:
+                self.player_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL)
+            except OSError as ex:
+                print("Failed to start player (%s). Exception: %s"%(cmd, ex))
         else:
             text = "Invalid page type: %s"%(pagetype)
             self.label_status.setText(text)
             self.layout.setCurrentWidget(self.label_status)
+
+        if self.player_process is not None and not pagetype == "videostream":
+            print("Killing player...")
+            try:
+                self.player_process.terminate()
+            except OSError as ex:
+                print("Failed to terminate player. Exception: %s"%(ex))
+            self.player_process = None
 
 
 def main():
