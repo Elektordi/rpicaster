@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
         self.label_message.setWordWrap(True)
 
         self.browser = QWebEngineView()
+        self.browser_img = QWebEngineView()
 
         self.black = QWidget()
         self.layout = QStackedLayout()
@@ -77,6 +78,7 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.label_status)
         self.layout.addWidget(self.label_message)
         self.layout.addWidget(self.browser)
+        self.layout.addWidget(self.browser_img)
 
         self.mainwidget = QWidget()
         self.mainwidget.setLayout(self.layout)
@@ -84,6 +86,7 @@ class MainWindow(QMainWindow):
 
         self.last_page = default_page
         self.last_url = ""
+        self.last_url_img = ""
         self.content(self.last_page)
 
         self.setStyleSheet("background-color: black; color: white;")
@@ -119,10 +122,11 @@ class MainWindow(QMainWindow):
             self.layout.setCurrentWidget(self.label_message)
         elif pagetype == "image":
             url = page.get('url', 'about:blank')
-            if url != self.last_url:
-                self.last_url = url
-                self.browser.setUrl(QUrl(url))
-            self.layout.setCurrentWidget(self.browser) # TODO
+            if url != self.last_url_img:
+                self.last_url_img = url
+                self.browser_img.setUrl(QUrl(url))
+                # No need for cache, integrated in QWebEngineView chrome engine
+            self.layout.setCurrentWidget(self.browser_img)
         elif pagetype == "web":
             url = page.get('url', 'about:blank')
             if url != self.last_url:
