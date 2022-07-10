@@ -139,6 +139,10 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    cursor = QCursor(Qt.BlankCursor)
+    app.setOverrideCursor(cursor)
+    app.changeOverrideCursor(cursor)
+
     window = MainWindow()
     app.exec()
 
