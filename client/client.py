@@ -5,6 +5,7 @@ import json
 import time
 import sys
 import threading
+from copy import copy
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -12,7 +13,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWebEngineWidgets import *
 
 storage = {}
-default_page = {"type":"message", "text":"RPiCaster display offline."}
+default_page = {"type":"status", "text":"RPiCaster display offline."}
 cache = {"page": default_page}
 
 
@@ -58,13 +59,31 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow,self).__init__(*args, **kwargs)
 
+        self.label_status = QLabel()
+        self.label_status.setStyleSheet("color: grey;")
+        self.label_status.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
+        self.label_message = QLabel()
+        self.label_message.setAlignment(Qt.AlignCenter)
+
         self.browser = QWebEngineView()
-        self.last_url = "about:blank"
-        self.browser.setUrl(QUrl(self.last_url))
 
-        self.setStyleSheet("background-color: black;")
-        self.setCentralWidget(self.browser)
+        self.black = QWidget()
+        self.layout = QStackedLayout()
+        self.layout.addWidget(self.black)
+        self.layout.addWidget(self.label_status)
+        self.layout.addWidget(self.label_message)
+        self.layout.addWidget(self.browser)
 
+        self.mainwidget = QWidget()
+        self.mainwidget.setLayout(self.layout)
+        self.setCentralWidget(self.mainwidget)
+
+        self.last_page = default_page
+        self.last_url = ""
+        self.content(self.last_page)
+
+        self.setStyleSheet("background-color: black; color: white;")
         self.show()
         self.showFullScreen()
 
@@ -80,13 +99,39 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def tick(self):
-        url = cache["page"].get("url")
-        if not url:
+        if cache['page'] == self.last_page:
             return
-        if url == self.last_url:
-            return
-        self.last_url = url
-        self.browser.setUrl(QUrl(url))
+        self.last_page = copy(cache['page'])
+        self.content(self.last_page)
+
+    def content(self, page):
+        pagetype = page.get("type", "unknow")
+        if pagetype == "status":
+            text = page.get("text", '')
+            self.label_status.setText(text)
+            self.layout.setCurrentWidget(self.label_status)
+        elif pagetype == "message":
+            text = page.get("text", '')
+            self.label_message.setText(text)
+            self.layout.setCurrentWidget(self.label_message)
+        elif pagetype == "image":
+            url = page.get('url', 'about:blank')
+            if url != self.last_url:
+                self.last_url = url
+                self.browser.setUrl(QUrl(url))
+            self.layout.setCurrentWidget(self.browser) # TODO
+        elif pagetype == "web":
+            url = page.get('url', 'about:blank')
+            if url != self.last_url:
+                self.last_url = url
+                self.browser.setUrl(QUrl(url))
+            self.layout.setCurrentWidget(self.browser)
+        elif pagetype == "videostream":
+            pass # TODO
+        else:
+            text = "Invalid page type: %s"%(pagetype)
+            self.label_status.setText(text)
+            self.layout.setCurrentWidget(self.label_status)
 
 
 def main():
