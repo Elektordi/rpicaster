@@ -7,6 +7,8 @@ import json
 app = Flask(__name__)
 sock = Sock(app)
 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600*24
+
 storage = {}
 clients = []
 
