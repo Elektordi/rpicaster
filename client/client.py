@@ -62,9 +62,12 @@ class MainWindow(QMainWindow):
         self.label_status = QLabel()
         self.label_status.setStyleSheet("color: grey;")
         self.label_status.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.label_status.setFont(QFont("Arial", 10))
 
         self.label_message = QLabel()
         self.label_message.setAlignment(Qt.AlignCenter)
+        self.label_message.setFont(QFont("Arial", 64, QFont.Bold))
+        self.label_message.setWordWrap(True)
 
         self.browser = QWebEngineView()
 
