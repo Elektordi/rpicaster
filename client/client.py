@@ -18,19 +18,7 @@ storage = {}
 default_page = {"type":"status", "text":"RPiCaster display offline."}
 cache = {"page": default_page}
 
-
-def mediaplayer():
-    if "mediaplayer" in cache:
-        return cache["mediaplayer"]
-    if os.path.isfile("/usr/bin/omxplayer"):
-        cache["mediaplayer"] = "/usr/bin/omxplayer"
-    elif os.path.isfile("/usr/bin/mplayer"):
-        cache["mediaplayer"] = "/usr/bin/mplayer"
-    elif os.path.isfile("/usr/bin/ffplay"):
-        cache["mediaplayer"] = "/usr/bin/ffplay"
-    else:
-        cache["mediaplayer"] = "false"
-    return cache["mediaplayer"]
+VLC_COMMANDLINE = "cvlc --aout=alsa --alsa-audio-device=default:CARD=vc4hdmi --fullscreen --no-osd"
 
 
 class stream(threading.Thread):
@@ -155,7 +143,7 @@ class MainWindow(QMainWindow):
             self.layout.setCurrentWidget(self.browser)
         elif pagetype == "videostream":
             self.layout.setCurrentWidget(self.black)
-            cmd = [mediaplayer(), page.get('url', 'invalid:')]
+            cmd = VLC_COMMANDLINE.split(" ") + [page.get('url', 'invalid:')]
             try:
                 self.player_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL)
             except OSError as ex:
