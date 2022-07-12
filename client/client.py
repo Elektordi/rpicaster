@@ -108,7 +108,10 @@ class MainWindow(QMainWindow):
 
         self.setStyleSheet("background-color: black; color: white;")
         self.show()
-        self.showFullScreen()
+        if os.environ.get("USER") == "pi":  # FIXME
+            self.setGeometry(0, 0, 1920, 1080)
+        else:
+            self.showFullScreen()
 
         self.stream = stream()
         self.stream.start()
