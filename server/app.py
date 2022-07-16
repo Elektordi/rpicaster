@@ -56,6 +56,18 @@ def route_reload():
     return "OK"
 
 
+@app.route("/srs_callback", methods=["POST"])
+def route_srs():
+    data = request.get_json()
+    print("Got SRS callback: %s"%(data))
+    if data.get('action') == 'on_publish':
+        storage['page'] = int(storage.get('interrupt_rtmp_page'))
+    elif data.get('action') == 'on_unpublish':
+        storage['page'] = int(storage.get('interrupt_end_page'))
+    broadcast({"page": storage['page']})
+    return "0"  # 0 = OK
+
+
 @app.route("/")
 def route_index():
     return "<p>RpiCaster</p>"
