@@ -50,6 +50,8 @@ def route_reload():
     with open("storage.json", "rt") as f:
         data = json.loads(f.read())
     storage.update(data)
+    if not storage.get('page'):
+        storage['page'] = int(storage.get('default_page', 0))
     broadcast(data)
     return "OK"
 

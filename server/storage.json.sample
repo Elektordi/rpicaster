@@ -3,5 +3,5 @@
 "page_2": {"type": "image", "url": "https://pbs.twimg.com/media/FA9JY82XMAMB9G9?format=jpg&name=large"},
 "page_3": {"type": "web", "url": "https://www.perdu.com/"},
 "page_4": {"type": "videostream", "url": "rtmp://192.168.1.123/live/livestream"},
-"page": 1
+"default_page": 1
 }
