@@ -18,13 +18,14 @@ def broadcast(data):
         try:
             c.send(json.dumps(data))
         except ConnectionClosed:
-            print("Client disconnected: %s:%d"%(c.sock.getpeername()))
+            print("Client disconnected: %s:%d"%(ws.remote_addr, ws.remote_port))
             clients.remove(c)
 
 
 @sock.route('/stream')
 def ws_stream(ws):
-    print("Client connected: %s:%d"%(ws.sock.getpeername()))
+    ws.remote_addr, ws.remote_port = ws.sock.getpeername()
+    print("Client connected: %s:%d"%(ws.remote_addr, ws.remote_port))
     clients.append(ws)
     try:
         ws.send(json.dumps(storage))
@@ -32,7 +33,7 @@ def ws_stream(ws):
             data = ws.receive()
             # TODO
     except ConnectionClosed:
-        print("Client disconnected: %s:%d"%(ws.sock.getpeername()))
+        print("Client disconnected: %s:%d"%(ws.remote_addr, ws.remote_port))
         clients.remove(ws)
 
 
