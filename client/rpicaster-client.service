@@ -1,0 +1,16 @@
+[Unit]
+Description=RPICaster Client
+After=network-online.target
+ 
+[Service]
+Type=simple
+User=root
+Group=root
+Restart=on-failure
+TimeoutStopSec=10
+
+ExecStart=xinit /usr/bin/env python3 /usr/local/rpicaster/client.py --fake-fullscreen
+ 
+[Install]
+WantedBy=multi-user.target
+

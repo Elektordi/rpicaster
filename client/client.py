@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
 
         self.setStyleSheet("background-color: black; color: white;")
         self.show()
-        if os.environ.get("USER") == "pi":  # FIXME
+        if "--fake-fullscreen" in sys.argv:
             self.setGeometry(0, 0, 1920, 1080)
         else:
             self.showFullScreen()
