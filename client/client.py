@@ -18,7 +18,7 @@ storage = {}
 default_page = {"type":"status", "text":"RPiCaster display offline."}
 cache = {"page": default_page}
 
-VLC_COMMANDLINE = "cvlc --aout=alsa --alsa-audio-device=default:CARD=vc4hdmi --fullscreen --no-osd"
+VLC_COMMANDLINE = "cvlc --loop --aout=alsa --alsa-audio-device=default:CARD=vc4hdmi --fullscreen --no-osd"
 
 
 class stream(threading.Thread):
