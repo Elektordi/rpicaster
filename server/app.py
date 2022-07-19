@@ -62,6 +62,9 @@ def route_reload():
 def route_srs():
     data = request.get_json()
     print("Got SRS callback: %s"%(data))
+    if data.get('app') != 'live' or data.get('stream') != 'livestream':
+        print("Invalid app/stream.")
+        continue
     if data.get('action') == 'on_publish':
         storage['page'] = int(storage.get('interrupt_rtmp_page'))
     elif data.get('action') == 'on_unpublish':
