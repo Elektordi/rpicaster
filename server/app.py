@@ -15,6 +15,7 @@ clients = []
 
 
 def broadcast(data):
+    print("=> %r"%(data))
     for c in clients:
         try:
             c.send(json.dumps(data))

@@ -37,10 +37,6 @@ class stream(threading.Thread):
                     storage.update(data)
                     print(storage)
                     cache['page'] = storage.get("page_%d"%(storage.get('page', 0)), default_page)
-                    for k in data.keys():
-                        if not k.startswith("page_"):
-                            continue
-                        print(k)
             except (KeyboardInterrupt):
                 sys.exit()
             except (EOFError):
