@@ -30,7 +30,7 @@ class stream(threading.Thread):
         self.running = True
         while True:
             try:
-                self.ws = simple_websocket.Client('ws://localhost:5000/stream')
+                self.ws = simple_websocket.Client('ws://localhost:5000/stream', ping_interval=60)
                 while True:
                     data = self.ws.receive()
                     data = json.loads(data)
