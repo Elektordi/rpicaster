@@ -41,8 +41,8 @@ class stream(threading.Thread):
                 sys.exit()
             except (EOFError):
                 self.ws.close()
-            except (simple_websocket.ConnectionClosed, ConnectionRefusedError):
-                pass
+            except Exception as ex:
+                print(ex)
 
             if not self.running:
                 return
