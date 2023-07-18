@@ -20,7 +20,7 @@ def broadcast(data):
         try:
             c.send(json.dumps(data))
         except ConnectionClosed:
-            print("Client disconnected: %s:%d"%(ws.remote_addr, ws.remote_port))
+            print("Client disconnected: %s:%d"%(c.remote_addr, c.remote_port))
             clients.remove(c)
 
 
@@ -64,7 +64,7 @@ def route_srs():
     print("Got SRS callback: %s"%(data))
     if data.get('app') != 'live' or data.get('stream') != 'livestream':
         print("Invalid app/stream.")
-        continue
+        return
     if data.get('action') == 'on_publish':
         storage['page'] = int(storage.get('interrupt_rtmp_page'))
     elif data.get('action') == 'on_unpublish':
