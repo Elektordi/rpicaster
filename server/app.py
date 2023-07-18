@@ -47,6 +47,33 @@ def route_play():
     return "OK"
 
 
+@app.route("/storage")
+def route_storage():
+    return json.dumps(storage)
+
+
+@app.route("/golive")
+def route_golive():
+    if not storage.get('rtmp'):
+        return "NOT LIVE (RTMP)"
+    storage['live'] = True
+    storage['page'] = int(storage.get('interrupt_live_page'))
+    broadcast({"page": storage['page']})
+    return "OK"
+
+
+@app.route("/endlive")
+def route_endlive():
+    if not storage.get('rtmp'):
+        return "NOT LIVE (RTMP)"
+    if storage.get('page') != int(storage.get('interrupt_live_page')):
+        return "NOT LIVE (PAGE)"
+    storage['live'] = False
+    storage['page'] = storage.get('interrupt_end_page')
+    broadcast({"page": storage['page']})
+    return "OK"
+
+
 @app.route("/reload")
 def route_reload():
     with open("storage.json", "rt") as f:
@@ -64,12 +91,19 @@ def route_srs():
     print("Got SRS callback: %s"%(data))
     if data.get('app') != 'live' or data.get('stream') != 'livestream':
         print("Invalid app/stream.")
-        return
+        return "1"
     if data.get('action') == 'on_publish':
-        storage['page'] = int(storage.get('interrupt_rtmp_page'))
+        storage['rtmp'] = True
+        if storage.get('interrupt_rtmp_page'):
+            storage['live'] = True
+            storage['page'] = int(storage.get('interrupt_rtmp_page'))
+            broadcast({"page": storage['page']})
     elif data.get('action') == 'on_unpublish':
-        storage['page'] = int(storage.get('interrupt_end_page'))
-    broadcast({"page": storage['page']})
+        storage['rtmp'] = False
+        if storage.get('interrupt_end_page'):
+            storage['live'] = False
+            storage['page'] = int(storage.get('interrupt_end_page'))
+            broadcast({"page": storage['page']})
     return "0"  # 0 = OK
 
 
